@@ -21,59 +21,7 @@ hxl_tags_activities:
   "FA Financing": "#finance+funded+usd"
   "Website": "#url+website"
 
-# Countries
-title_countries: "Global Climate Funded Countries"
-resource_countries: "Funded countries"
-description_countries: "List of funded countries"
-
-hxl_tags_countries:
-  "ISO3": "#country+code"
-  "Country Name": "#country+name"
-  "Region": "#region+name"
-  "SIDS": "#country+is_sids+flag"
-  "LDCs": "#country+is_ldc+flag"
-  "# RP": "#count+readiness_programmes"
-  "# FA": "#count+funded_activities"
-  "RP Financing": "#finance+readiness+usd"
-  "FA Financing": "#finance+funded+usd"
-
-# Entities
-title_entities: "Global Climate Funding Entities"
-resource_entities: "Entity funding"
-description_entities: "Shows accreditation process stage of entities"
-
-hxl_tags_entities:
-  "Entity": "#org+implementing+acronym"
-  "Name": "#org+implementing+name"
-  "Country": "#country+name"
-  "DAE": "#org+is_dae+flag"
-  "Type": "#org+type"
-  "Stage": "#org+stage"
-  "BM": "#board+meeting+id"
-  "Size": "#org+size"
-  "Sector": "#sector+name"
-  "# Approved": "#count+approved"
-  "FA Financing": "#finance+funded+usd"
-
-# Readiness
-title_readiness: "Global Climate Funding Readiness"
-resource_readiness: "Climate funding readiness"
-description_readiness: "Climate funding status"
-
-hxl_tags_readiness:
-  "Ref #": "#reference+id"
-  "Activity": "#activity"
-  "Project Title": "#project+title"
-  "Country": "#country+name"
-  "Delivery Partner": "#delivery+partner"
-  "Region": "#region"
-  "Status": "#status"
-  "Approved Date": "#date+approved"
-  "Financing": "#financing+value+usd"
-
-tags:
-  - climate-weather
-  - funding
+notes_activities: "This dataset provides a list of climate funded activities showing the modality, project, name of entity, countries funded, the sector, theme, project size, ESS Category and FA financing."
 
 caveats_activities: |
   1. Please note that the readiness grant information provided in the ODL includes the approved grants only.
@@ -122,6 +70,25 @@ caveats_activities: |
 
   **Regional**
   ‘Yes’ returns only regional readiness grants
+
+# Countries
+title_countries: "Global Climate Funded Countries"
+resource_countries: "Funded countries"
+description_countries: "List of funded countries"
+
+hxl_tags_countries:
+  "ISO3": "#country+code"
+  "Country Name": "#country+name"
+  "Region": "#region+name"
+  "SIDS": "#country+is_sids+flag"
+  "LDCs": "#country+is_ldc+flag"
+  "# RP": "#count+readiness_programmes"
+  "# FA": "#count+funded_activities"
+  "RP Financing": "#finance+readiness+usd"
+  "FA Financing": "#finance+funded+usd"
+
+notes_countries: "This dataset shows funding for countries classified as small Island developing States and countries classified as Least Developed Countries."
+
 caveats_countries: |
   For multi-country projects, financial information per country is equally divided unless the allocation % is specified.
 
@@ -135,6 +102,28 @@ caveats_countries: |
 
   **LDCs**
   'Yes' returns only countries classified as Least Developed Countries.
+
+
+# Entities
+title_entities: "Global Climate Funding Entities"
+resource_entities: "Entity funding"
+description_entities: "Shows accreditation process stage of entities"
+
+hxl_tags_entities:
+  "Entity": "#org+implementing+acronym"
+  "Name": "#org+implementing+name"
+  "Country": "#country+name"
+  "DAE": "#org+is_dae+flag"
+  "Type": "#org+type"
+  "Stage": "#org+stage"
+  "BM": "#board+meeting+id"
+  "Size": "#org+size"
+  "Sector": "#sector+name"
+  "# Approved": "#count+approved"
+  "FA Financing": "#finance+funded+usd"
+
+notes_entities: "This dataset shows the climate funding entity accreditation process stage."
+
 caveats_entities: |
   ### Glossary
 
@@ -152,6 +141,25 @@ caveats_entities: |
 
   **Size**
   Entity size.
+
+# Readiness
+title_readiness: "Global Climate Funding Readiness"
+resource_readiness: "Climate funding readiness"
+description_readiness: "Climate funding status"
+
+hxl_tags_readiness:
+  "Ref #": "#reference+id"
+  "Activity": "#activity"
+  "Project Title": "#project+title"
+  "Country": "#country+name"
+  "Delivery Partner": "#delivery+partner"
+  "Region": "#region"
+  "Status": "#status"
+  "Approved Date": "#date+approved"
+  "Financing": "#financing+value+usd"
+
+notes_readiness: "This dataset shows the climate funding status."
+
 caveats_readiness: |
   Please note that the readiness grant information provided in the ODL includes the approved grants only.
   The number of approved grants in ODL Readiness covers only the Readiness proposals approved with the logical framework as per the Readiness Preparatory Support Strategies approved by the Board (i.e., excluding technical assistance grants, workshop activities, and structured dialogues executed with the Readiness budget).
@@ -199,3 +207,7 @@ caveats_readiness: |
 
   **Regional**
   ‘Yes’ returns only regional readiness grants
+
+tags:
+  - climate-weather
+  - funding

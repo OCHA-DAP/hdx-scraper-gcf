@@ -59,12 +59,28 @@ def main(
             #
             # Steps to generate dataset
             #
+
             datasets = []
             tables = ["activities", "countries", "entities", "readiness"]
 
             for table in tables:
                 func = getattr(pipeline, f"generate_{table}_dataset")
                 datasets.append({"table": table, "dataset": func()})
+
+            # country_dataset = pipeline.generate_by_country_dataset()
+
+            # countries_data = Country.countriesdata()
+            # countries = []
+            # for iso3_key, attrs in countries_data["countries"].items():
+            #     countries.append(
+            #         {
+            #             "iso3": attrs.get("#country+code+v_iso3"),
+            #             "name": attrs.get("#country+name+preferred"),
+            #         }
+            #     )
+            # for country in countries:
+            #     temp = pipeline._filter_by_iso3(country["iso3"])
+            #     print(country["iso3"], temp)
 
             for d in datasets:
                 table = d["table"]
@@ -76,9 +92,12 @@ def main(
                         )
                     )
 
-                    # Set caveat metadata based on table
+                    # Set metadata based on table
                     caveats_key = f"caveats_{table}"
                     dataset["caveats"] = configuration.get(caveats_key, "")
+
+                    notes_key = f"notes_{table}"
+                    dataset["notes"] = configuration.get(notes_key, "")
 
                     dataset.create_in_hdx(
                         remove_additional_resources=True,
