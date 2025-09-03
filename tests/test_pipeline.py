@@ -1,5 +1,6 @@
 from os.path import join
 
+from hdx.utilities.compare import assert_files_same
 from hdx.utilities.downloader import Download
 from hdx.utilities.path import temp_dir
 from hdx.utilities.retriever import Retrieve
@@ -42,7 +43,7 @@ class TestPipeline:
                     assert dataset == {
                         "name": "global-climate-funded-activities",
                         "title": "Global Climate Funded Activities",
-                        "dataset_date": "[2017-04-06T00:00:00 TO 2021-10-07T23:59:59]",
+                        "dataset_date": "[2015-11-05T00:00:00 TO 2025-07-03T23:59:59]",
                         "tags": [
                             {
                                 "name": "climate-weather",
@@ -59,9 +60,9 @@ class TestPipeline:
                         "groups": [{"name": "world"}],
                         "package_creator": "HDX Data Systems Team",
                         "private": False,
-                        "maintainer": "fdbb8e79-f020-4039-ab3a-9adb482273b8",
-                        "owner_org": "hdx",
-                        "data_update_frequency": 30,
+                        "maintainer": "b682f6f7-cd7e-4bd4-8aa7-f74138dc6313",
+                        "owner_org": "b0061e83-0d61-4ede-b1c9-284c6472c216",
+                        "data_update_frequency": -2,
                     }
 
                     resources = dataset.get_resources()
@@ -74,3 +75,11 @@ class TestPipeline:
                             "url_type": "upload",
                         },
                     ]
+
+                for resource in resources:
+                    if resource["url_type"] != "upload":
+                        continue
+                    filename = f"{resource['name']}.csv"
+                    actual = join(tempdir, filename)
+                    expected = join(input_dir, filename)
+                    assert_files_same(actual, expected)

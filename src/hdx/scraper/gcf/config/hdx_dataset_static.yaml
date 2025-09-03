@@ -5,5 +5,5 @@ package_creator: HDX Data Systems Team
 private: False
 maintainer: b682f6f7-cd7e-4bd4-8aa7-f74138dc6313 # berylnyamgeroh
 owner_org: b0061e83-0d61-4ede-b1c9-284c6472c216 # gcf
-data_update_frequency: 30
+data_update_frequency: -2
 # notes: The Green Climate Fund (GCF) – a critical element of the historic Paris Agreement - is the world’s largest climate fund, mandated to support developing countries raise and realize their Nationally Determined Contributions (NDC) ambitions towards low-emissions, climate-resilient pathways.

@@ -2,12 +2,14 @@
 """Gcf scraper"""
 
 import logging
-from copy import deepcopy
+from collections import defaultdict
 from datetime import datetime
 from typing import List, Optional, Tuple
 
 from hdx.api.configuration import Configuration
 from hdx.data.dataset import Dataset
+from hdx.location.country import Country
+from hdx.utilities.dateparse import parse_date
 from hdx.utilities.retriever import Retrieve
 from slugify import slugify
 
@@ -22,6 +24,7 @@ class Pipeline:
         self._base_url = self._configuration["base_url"]
         self._project_data = None
         self._readiness_data = None
+        self._countries = set()
 
     def generate_activities_dataset(self) -> Optional[Dataset]:
         # Funded Activities
@@ -51,12 +54,50 @@ class Pipeline:
         dataset.generate_resource_from_iterable(
             headers=list(activities_data[0].keys()),
             iterable=activities_data,
-            hxltags=self._configuration["hxl_tags_activities"],
+            hxltags={},
             folder=self._tempdir,
             filename=f"{self._configuration['resource_activities']}.csv",
             resourcedata=resource_data,
             quickcharts=None,
         )
+
+        return dataset
+
+    def generate_activities_by_country_dataset(
+        self, iso3: str, country_data: List
+    ) -> Optional[Dataset]:
+        country_name = Country.get_country_name_from_iso3(iso3)
+        dataset_title = f"{country_name} - Climate Funded Activities"
+        dataset_name = slugify(dataset_title)
+        min_date, max_date = self._get_date_range(country_data)
+
+        dataset = Dataset(
+            {
+                "name": dataset_name,
+                "title": dataset_title,
+            }
+        )
+
+        dataset.add_country_location(iso3)
+        dataset.add_tags(self._configuration["tags"])
+        dataset.set_time_period(startdate=min_date, enddate=max_date)
+
+        # Add resources here
+        resource_data = {
+            "name": self._configuration["resource_activities"],
+            "description": f"{self._configuration['description_activities']} in {country_name}",
+        }
+
+        dataset.generate_resource_from_iterable(
+            headers=list(country_data[0].keys()),
+            iterable=country_data,
+            hxltags={},
+            folder=self._tempdir,
+            filename=f"{dataset_name}.csv",
+            resourcedata=resource_data,
+            quickcharts=None,
+        )
+
         return dataset
 
     def generate_countries_dataset(self) -> Optional[Dataset]:
@@ -64,7 +105,7 @@ class Pipeline:
         countries_data = self._get_countries_data()
         dataset_title = self._configuration["title_countries"]
         dataset_name = slugify(dataset_title)
-        # min_date, max_date = self._get_date_range(countries_data)
+        min_date, max_date = self._get_date_range(countries_data)
 
         dataset = Dataset(
             {
@@ -75,7 +116,7 @@ class Pipeline:
 
         dataset.add_other_location("world")
         dataset.add_tags(self._configuration["tags"])
-        dataset.set_time_period(startdate="January 1, 2024", enddate="January 1, 2025")
+        dataset.set_time_period(min_date, max_date)
 
         # Add resources here
         resource_data = {
@@ -100,7 +141,7 @@ class Pipeline:
 
         dataset_title = self._configuration["title_entities"]
         dataset_name = slugify(dataset_title)
-        # min_date, max_date = self._get_date_range(countries_data)
+        min_date, max_date = self._get_date_range(entities_data)
 
         dataset = Dataset(
             {
@@ -111,7 +152,7 @@ class Pipeline:
 
         dataset.add_other_location("world")
         dataset.add_tags(self._configuration["tags"])
-        dataset.set_time_period(startdate="January 1, 2024", enddate="January 1, 2025")
+        dataset.set_time_period(min_date, max_date)
 
         # Add resources here
         resource_data = {
@@ -166,19 +207,6 @@ class Pipeline:
         )
         return dataset
 
-    def generate_by_country_dataset(self) -> Optional[Dataset]:
-        countries = self.get_data_by_country(self._project_data)
-        print(countries)
-
-        dataset = Dataset(
-            {
-                "name": "dataset name",
-                "title": "dataset title",
-            }
-        )
-
-        return dataset
-
     def _fetch_project_data(self) -> List:
         if self._project_data is None:
             data_url = f"{self._base_url}/projects"
@@ -191,14 +219,6 @@ class Pipeline:
             self._readiness_data = self._retriever.download_json(data_url)
         return self._readiness_data
 
-    def _filter_by_iso3(self, iso3_code):
-        """
-        Return a list of all rows where the 'ISO3' field equals iso3_code.
-        """
-        data = self._fetch_project_data()
-        print(data)
-        return [row for row in data if row.get("iso3") == iso3_code]
-
     def _get_activities_data(self) -> List:
         """
         Get list of funded activities
@@ -206,7 +226,7 @@ class Pipeline:
         """
         records = self._fetch_project_data()
 
-        result = []
+        activity_data = []
         for record in records:
             # Get entity name from first entity in list
             entities = record.get("Entities", [])
@@ -217,45 +237,76 @@ class Pipeline:
             names = [c.get("CountryName") for c in countries if "CountryName" in c]
             country_names = ", ".join(names)
 
-            # Parse date
-            approved_date = record.get("ApprovalDate")
-            approved_date_fmt = None
-            if approved_date:
-                # Strip Z and format
-                date = datetime.fromisoformat(approved_date.replace("Z", "+00:00"))
-                approved_date_fmt = f"{date.strftime('%B')} {date.day}, {date.year}"
+            # Get comma delimited string of country codes from countries list
+            codes = [c.get("ISO3") for c in countries if "ISO3" in c]
+            self._countries.update(codes)
+            country_codes = ", ".join(codes)
 
-            result.append(
+            # Parse dates
+            approval_date = self._format_date(record.get("ApprovalDate"))
+            completion_date = self._format_date(record.get("DateCompletion"))
+
+            # Determine modality
+            ref_id = record.get("ApprovedRef", "")
+            modality = (
+                "FP"
+                if ref_id.startswith("FP")
+                else "SAP"
+                if ref_id.startswith("SAP")
+                else ""
+            )
+
+            # Get comma delimited string of result areas that are > 0%
+            result_areas = record.get("ResultAreas", [])
+            areas = [
+                a.get("Area")
+                for a in result_areas
+                if a.get("Value") and float(a["Value"].rstrip("%")) > 0
+            ]
+            result_areas = ", ".join(areas)
+
+            activity_data.append(
                 {
-                    "Ref #": record.get("ApprovedRef"),
-                    "Modality": "",
+                    "Ref #": ref_id,
+                    "Modality": modality,
                     "Project Name": record.get("ProjectName"),
                     "Entity": entity,
                     "Countries": country_names,
-                    "BM": record.get("BoardMeeting"),
-                    "Sector": record.get("Sector"),
-                    "Theme": record.get("Theme"),
-                    "Project Size": record.get("Size"),
-                    "Approved Date": approved_date_fmt,
-                    "ESS Category": record.get("RiskCategory"),
-                    "FA Financing": record.get("TotalGCFFunding"),
-                    "Website": record.get("ProjectURL"),
+                    "Country Codes": country_codes,
+                    "Board Meeting": record.get("BoardMeeting", ""),
+                    "Sector": record.get("Sector", ""),
+                    "Theme": record.get("Theme", ""),
+                    "Project Size": record.get("Size", ""),
+                    "Approval Date": approval_date,
+                    "Completion Date": completion_date,
+                    "ESS Category": record.get("RiskCategory", ""),
+                    "FA Financing": record.get("TotalGCFFunding", ""),
+                    "Result Areas": result_areas,
+                    "Status": record.get("Status", ""),
+                    "Project URL": record.get("ProjectURL", ""),
+                    "API URL": f"http://api.gcfund.org/v1/projects/{record.get('ProjectsID', '')}",
                 }
             )
 
-        return result
+        return activity_data
 
     def _get_countries_data(self) -> List:
         """
         Get list of countries from project data
         Generate columns according to table: https://data.greenclimate.fund/public/data/countries
+
+        "FA Financing" is financing for each project weighted by the “Country Allocation” (for multi-country
+        projects we assign a country allocation, the sum of the allocation for each project is 1)
         """
         records = self._fetch_project_data()
 
         aggregated_data = {}
         for record in records:
+            countries = record.get("Countries", [])
             project_funding = record.get("TotalGCFFunding", 0) or 0
-            for country in record.get("Countries", []):
+            project_funding = project_funding / len(countries)
+            approval_date = self._format_date(record.get("ApprovalDate"))
+            for country in countries:
                 iso3 = country.get("ISO3")
                 if not iso3:
                     continue
@@ -269,8 +320,7 @@ class Pipeline:
                         "SIDS": country.get("SIDS", False),
                         "FA Financing": 0,
                         "# FA": 0,
-                        "# RP": 0,
-                        "RP Financing": 0,
+                        "Approval Date": approval_date,
                     }
 
                 # update aggregates
@@ -289,35 +339,29 @@ class Pipeline:
 
         aggregated_data = {}
         for record in records:
+            fa_financing = record.get("TotalGCFFunding", 0) or 0
+            approval_date = self._format_date(record.get("ApprovalDate"))
             for entity in record.get("Entities", []):
                 acronym = entity.get("Acronym")
-                name = entity.get("Name")
-                if not (acronym or name):
+                if not acronym:
                     continue
 
                 if acronym not in aggregated_data:
                     aggregated_data[acronym] = {
                         "Entity": entity.get("Acronym", ""),
                         "Name": entity.get("Name", ""),
-                        "Country": [],
                         "DAE": "TRUE" if entity.get("Access") == "Direct" else "FALSE",
                         "Type": entity.get("Type", ""),
-                        "Stage": "",
-                        "BM": record.get("BoardMeeting"),
-                        "Size": record.get("Size"),
                         "Sector": entity.get("Sector"),
                         "# Approved": 0,
                         "FA Financing": 0,
+                        "Approval Date": approval_date,
                     }
 
                 # update aggregates
                 agg_entry = aggregated_data[acronym]
                 agg_entry["# Approved"] += 1
-                # countries = record.get("Countries")
-                # names = []
-                # for country in countries:
-                #     names.append(country.get("CountryName"))
-                # agg_entry["Country"] = ", ".join(names)
+                agg_entry["FA Financing"] += fa_financing
 
         return list(aggregated_data.values())
 
@@ -335,12 +379,7 @@ class Pipeline:
             country_name = countries[0].get("CountryName") if countries else None
 
             # Parse date
-            approved_date = rec.get("AgreementSignedDate")
-            approved_date_fmt = None
-            if approved_date:
-                # Strip Z and format
-                date = datetime.fromisoformat(approved_date.replace("Z", "+00:00"))
-                approved_date_fmt = f"{date.strftime('%B')} {date.day}, {date.year}"
+            approval_date = self._format_date(rec.get("AgreementSignedDate"))
 
             result.append(
                 {
@@ -351,48 +390,44 @@ class Pipeline:
                     "Delivery Partner": rec.get("DeliveryPartner"),
                     "Region": rec.get("Region"),
                     "Status": rec.get("Status"),
-                    "Approved Date": approved_date_fmt,
+                    "Approval Date": approval_date,
                     "Financing": rec.get("AmountApprovedInUSD"),
                 }
             )
 
         return result
 
-    def get_data_by_country(self, projects):
+    def get_activities_by_country(self) -> dict:
         """
-        Given a list of project dicts (each with a 'Countries' list),
-        return a list of unique country dicts that include both
-        the country's own fields and all project-level fields.
+        Group activity data by country
         """
-        unique = {}
+        projects = self._get_activities_data()
+        country_projects = defaultdict(list)
+        for project in projects:
+            # Split on commas in cases where project has multiple countries
+            countries_data = project.get("Country Codes", "")
+            countries = [
+                code.strip() for code in countries_data.split(",") if code.strip()
+            ]
+            for country in countries:
+                country_projects[country].append(project)
+        return dict(country_projects)
 
-        for proj in projects:
-            proj_id = proj.get("ProjectsID")
-            proj_name = proj.get("ProjectName")
-            for c in proj.get("Countries", []):
-                iso = c["ISO3"]
-                if iso not in unique:
-                    # start with a deep copy so we don't accidentally mutate the original
-                    country_copy = deepcopy(c)
-                    # add an empty list for Projects
-                    country_copy["Projects"] = []
-                    unique[iso] = country_copy
-                # append this project to the country's Projects list
-                unique[iso]["Projects"].append(
-                    {"ProjectsID": proj_id, "ProjectName": proj_name}
-                )
+    def _format_date(self, date: Optional[str]) -> Optional[str]:
+        date_fmt = None
+        if date:
+            # Strip Z and format
+            d = datetime.fromisoformat(date.replace("Z", "+00:00"))
+            date_fmt = f"{d.strftime('%B')} {d.day}, {d.year}"
+        return date_fmt
 
-        return list(unique.values())
-
-    def _get_date_range(
-        self, records: List
-    ) -> Tuple[Optional[datetime], Optional[datetime]]:
+    def _get_date_range(self, records: List) -> Tuple:
         dates = []
         for rec in records:
-            date = rec.get("Approved Date")
+            date = rec.get("Approval Date")
             if not date:
                 continue
-            dates.append(date)
+            dates.append(parse_date(date))
 
         if not dates:
             return None, None
