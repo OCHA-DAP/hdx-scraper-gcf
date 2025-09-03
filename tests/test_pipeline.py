@@ -71,8 +71,6 @@ class TestPipeline:
                             "name": "Climate funded activities",
                             "description": "A list of climate funded activities",
                             "format": "csv",
-                            "resource_type": "file.upload",
-                            "url_type": "upload",
                         },
                     ]
 

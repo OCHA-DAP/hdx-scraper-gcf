@@ -3,7 +3,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/OCHA-DAP/hdx-scraper-gcf/badge.svg?branch=main&ts=1)](https://coveralls.io/github/OCHA-DAP/hdx-scraper-gcf?branch=main)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
-This script ...
+This script recreates tables (activities, countries, entities, and readiness) from the GCF databases by querying the Activities and Readiness APIs. The countries and entities datasets are extracted from the Activities API. Country specific datasets are also created from the Activity data. The script runs as needed.
 
 ## Development
 
