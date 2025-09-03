@@ -75,8 +75,6 @@ class TestPipeline:
                     ]
 
                 for resource in resources:
-                    if resource["url_type"] != "upload":
-                        continue
                     filename = f"{resource['name']}.csv"
                     actual = join(tempdir, filename)
                     expected = join(input_dir, filename)
