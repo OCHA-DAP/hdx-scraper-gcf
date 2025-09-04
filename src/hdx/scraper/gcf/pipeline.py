@@ -67,7 +67,7 @@ class Pipeline:
         self, iso3: str, country_data: List
     ) -> Optional[Dataset]:
         country_name = Country.get_country_name_from_iso3(iso3)
-        dataset_title = f"{country_name} - Climate Funded Activities"
+        dataset_title = f"{country_name} - GCF Funded Activities"
         dataset_name = slugify(dataset_title)
         min_date, max_date = self._get_date_range(country_data)
 
@@ -127,7 +127,7 @@ class Pipeline:
         dataset.generate_resource_from_iterable(
             headers=list(countries_data[0].keys()),
             iterable=countries_data,
-            hxltags=self._configuration["hxl_tags_countries"],
+            hxltags={},
             folder=self._tempdir,
             filename=f"{self._configuration['resource_countries']}.csv",
             resourcedata=resource_data,
@@ -163,7 +163,7 @@ class Pipeline:
         dataset.generate_resource_from_iterable(
             headers=list(entities_data[0].keys()),
             iterable=entities_data,
-            hxltags=self._configuration["hxl_tags_entities"],
+            hxltags={},
             folder=self._tempdir,
             filename=f"{self._configuration['resource_entities']}.csv",
             resourcedata=resource_data,
@@ -199,7 +199,7 @@ class Pipeline:
         dataset.generate_resource_from_iterable(
             headers=list(readiness_data[0].keys()),
             iterable=readiness_data,
-            hxltags=self._configuration["hxl_tags_readiness"],
+            hxltags={},
             folder=self._tempdir,
             filename=f"{self._configuration['resource_readiness']}.csv",
             resourcedata=resource_data,

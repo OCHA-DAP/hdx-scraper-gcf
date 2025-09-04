@@ -41,8 +41,8 @@ class TestPipeline:
                     )
 
                     assert dataset == {
-                        "name": "global-climate-funded-activities",
-                        "title": "Global Climate Funded Activities",
+                        "name": "gcf-funded-activities",
+                        "title": "GCF Funded Activities",
                         "dataset_date": "[2015-11-05T00:00:00 TO 2025-07-03T23:59:59]",
                         "tags": [
                             {
@@ -62,7 +62,7 @@ class TestPipeline:
                         "private": False,
                         "maintainer": "b682f6f7-cd7e-4bd4-8aa7-f74138dc6313",
                         "owner_org": "b0061e83-0d61-4ede-b1c9-284c6472c216",
-                        "data_update_frequency": -2,
+                        "data_update_frequency": 120,
                     }
 
                     resources = dataset.get_resources()

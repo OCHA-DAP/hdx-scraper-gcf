@@ -2,28 +2,9 @@
 base_url: "http://api.gcfund.org/v1"
 
 # Funded Activities
-title_activities: "Global Climate Funded Activities"
+title_activities: "GCF Funded Activities"
 resource_activities: "Climate funded activities"
 description_activities: "A list of climate funded activities"
-
-#hxl_tags_activities:
-#  "Ref #": "#reference+id"
-#  "Modality": "#meta+modality"
-#  "Project Name": "#project+title"
-#  "Entity": "#org+implementing"
-#  "Countries": "#country+name"
-#  "Board Meeting": "#board+meeting+id"
-#  "Sector": "#sector+name"
-#  "Theme": "#theme+name"
-#  "Project Size": "#project+size"
-#  "Approval Date": "#date+approval"
-#  "Completion Date": "#date+completion"
-#  "ESS Category": "#category+risk"
-#  "FA Financing": "#finance+funded+usd"
-#  "Result Areas": "#meta+result+area"
-#  "Status": "#meta+status"
-#  "Project URL": "#url+project"
-#  "API URL": "#url+api"
 
 notes_activities: "This dataset provides a list of climate funded activities showing the modality, project, name of entity, countries funded, the sector, theme, project size, ESS Category and FA financing."
 
@@ -36,20 +17,9 @@ caveats_activities: |
   [Link to Glossary](https://data.greenclimate.fund/public/data/projects)
 
 # Countries
-title_countries: "Global Climate Funded Countries"
+title_countries: "GCF Funded Countries"
 resource_countries: "Funded countries"
 description_countries: "List of funded countries"
-
-hxl_tags_countries:
-  "ISO3": "#country+code"
-  "Country Name": "#country+name"
-  "Region": "#region+name"
-  "SIDS": "#country+is_sids+flag"
-  "LDCs": "#country+is_ldc+flag"
-  "# FA": "#count+funded_activities"
-  "FA Financing": "#finance+funded+usd"
-  "# RP": "#count+readiness_programmes"
-  "RP Financing": "#finance+readiness+usd"
 
 notes_countries: "This dataset shows funding for countries classified as small Island developing States and countries classified as Least Developed Countries."
 
@@ -60,22 +30,9 @@ caveats_countries: |
 
 
 # Entities
-title_entities: "Global Climate Funding Entities"
+title_entities: "GCF Accredited Entities"
 resource_entities: "Entity funding"
 description_entities: "Shows accreditation process stage of entities"
-
-hxl_tags_entities:
-  "Entity": "#org+implementing+acronym"
-  "Name": "#org+implementing+name"
-  "Country": "#country+name"
-  "DAE": "#org+is_dae+flag"
-  "Type": "#org+type"
-  "Stage": "#org+stage"
-  "Board Meeting": "#board+meeting+id"
-  "Size": "#org+size"
-  "Sector": "#sector+name"
-  "# Approved": "#count+approved"
-  "FA Financing": "#finance+funded+usd"
 
 notes_entities: "This dataset shows the climate funding entity accreditation process stage."
 
@@ -83,20 +40,9 @@ caveats_entities: |
   [Link to Glossary](https://data.greenclimate.fund/public/data/entities)
 
 # Readiness
-title_readiness: "Global Climate Funding Readiness"
+title_readiness: "GCF Readiness Programmes"
 resource_readiness: "Climate funding readiness"
 description_readiness: "Climate funding status"
-
-hxl_tags_readiness:
-  "Ref #": "#reference+id"
-  "Activity": "#activity"
-  "Project Title": "#project+title"
-  "Country": "#country+name"
-  "Delivery Partner": "#delivery+partner"
-  "Region": "#region"
-  "Status": "#status"
-  "Approval Date": "#date+approval"
-  "Financing": "#financing+value+usd"
 
 notes_readiness: "This dataset shows the climate funding status."
 
