@@ -34,7 +34,6 @@ class TestPipeline:
                     datasets.append({"table": table, "dataset": func()})
 
                 for d in datasets:
-                    table = d["table"]
                     dataset = d["dataset"]
                     dataset.update_from_yaml(
                         path=join(config_dir, "hdx_dataset_static.yaml")
