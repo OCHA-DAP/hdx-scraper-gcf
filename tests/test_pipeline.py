@@ -60,7 +60,7 @@ class TestPipeline:
                         "groups": [{"name": "world"}],
                         "package_creator": "HDX Data Systems Team",
                         "private": False,
-                        "maintainer": "b682f6f7-cd7e-4bd4-8aa7-f74138dc6313",
+                        "maintainer": "8e4f8e25-11a8-403a-8ab8-5d0d1d1f830e",
                         "owner_org": "b0061e83-0d61-4ede-b1c9-284c6472c216",
                         "data_update_frequency": 120,
                     }
