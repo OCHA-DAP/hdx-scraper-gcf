@@ -1,5 +1,6 @@
 from os.path import join
 
+from hdx.utilities.compare import assert_files_same
 from hdx.utilities.downloader import Download
 from hdx.utilities.path import temp_dir
 from hdx.utilities.retriever import Retrieve
@@ -24,7 +25,56 @@ class TestPipeline:
                     use_saved=True,
                 )
                 pipeline = Pipeline(configuration, retriever, tempdir)
-                dataset = pipeline.generate_dataset()
-                dataset.update_from_yaml(
-                    path=join(config_dir, "hdx_dataset_static.yaml")
-                )
+
+                datasets = []
+                tables = ["activities"]  # , "countries", "entities", "readiness"
+
+                for table in tables:
+                    func = getattr(pipeline, f"generate_{table}_dataset")
+                    datasets.append({"table": table, "dataset": func()})
+
+                for d in datasets:
+                    dataset = d["dataset"]
+                    dataset.update_from_yaml(
+                        path=join(config_dir, "hdx_dataset_static.yaml")
+                    )
+
+                    assert dataset == {
+                        "name": "gcf-funded-activities",
+                        "title": "GCF Funded Activities",
+                        "dataset_date": "[2015-11-05T00:00:00 TO 2025-07-03T23:59:59]",
+                        "tags": [
+                            {
+                                "name": "climate-weather",
+                                "vocabulary_id": "b891512e-9516-4bf5-962a-7a289772a2a1",
+                            },
+                            {
+                                "name": "funding",
+                                "vocabulary_id": "b891512e-9516-4bf5-962a-7a289772a2a1",
+                            },
+                        ],
+                        "license_id": "cc-by",
+                        "methodology": "Registry",
+                        "dataset_source": "Multiple sources",
+                        "groups": [{"name": "world"}],
+                        "package_creator": "HDX Data Systems Team",
+                        "private": False,
+                        "maintainer": "8e4f8e25-11a8-403a-8ab8-5d0d1d1f830e",
+                        "owner_org": "b0061e83-0d61-4ede-b1c9-284c6472c216",
+                        "data_update_frequency": 120,
+                    }
+
+                    resources = dataset.get_resources()
+                    assert resources == [
+                        {
+                            "name": "Climate funded activities",
+                            "description": "A list of climate funded activities",
+                            "format": "csv",
+                        },
+                    ]
+
+                for resource in resources:
+                    filename = f"{resource['name']}.csv"
+                    actual = join(tempdir, filename)
+                    expected = join(input_dir, filename)
+                    assert_files_same(actual, expected)

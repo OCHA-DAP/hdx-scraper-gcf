@@ -3,7 +3,7 @@ methodology: Registry
 dataset_source: Multiple sources
 package_creator: HDX Data Systems Team
 private: False
-maintainer: fdbb8e79-f020-4039-ab3a-9adb482273b8
-owner_org: hdx
-data_update_frequency: 30
-notes: The Green Climate Fund (GCF) – a critical element of the historic Paris Agreement - is the world’s largest climate fund, mandated to support developing countries raise and realize their Nationally Determined Contributions (NDC) ambitions towards low-emissions, climate-resilient pathways.
+maintainer: 8e4f8e25-11a8-403a-8ab8-5d0d1d1f830e # claude_hakuna
+owner_org: b0061e83-0d61-4ede-b1c9-284c6472c216 # gcf
+data_update_frequency: 120
+# notes: The Green Climate Fund (GCF) – a critical element of the historic Paris Agreement - is the world’s largest climate fund, mandated to support developing countries raise and realize their Nationally Determined Contributions (NDC) ambitions towards low-emissions, climate-resilient pathways.
