@@ -51,14 +51,12 @@ class Pipeline:
             "description": self._configuration["description_activities"],
         }
 
-        dataset.generate_resource_from_iterable(
-            headers=list(activities_data[0].keys()),
-            iterable=activities_data,
-            hxltags={},
+        dataset.generate_resource(
             folder=self._tempdir,
             filename=f"{self._configuration['resource_activities']}.csv",
+            rows=activities_data,
             resourcedata=resource_data,
-            quickcharts=None,
+            headers=list(activities_data[0].keys()),
         )
 
         return dataset
@@ -88,14 +86,12 @@ class Pipeline:
             "description": f"{self._configuration['description_activities']} in {country_name}",
         }
 
-        dataset.generate_resource_from_iterable(
-            headers=list(country_data[0].keys()),
-            iterable=country_data,
-            hxltags={},
+        dataset.generate_resource(
             folder=self._tempdir,
             filename=f"{dataset_name}.csv",
+            rows=country_data,
             resourcedata=resource_data,
-            quickcharts=None,
+            headers=list(country_data[0].keys()),
         )
 
         return dataset
@@ -124,14 +120,12 @@ class Pipeline:
             "description": self._configuration["description_countries"],
         }
 
-        dataset.generate_resource_from_iterable(
-            headers=list(countries_data[0].keys()),
-            iterable=countries_data,
-            hxltags={},
+        dataset.generate_resource(
             folder=self._tempdir,
             filename=f"{self._configuration['resource_countries']}.csv",
+            rows=countries_data,
             resourcedata=resource_data,
-            quickcharts=None,
+            headers=list(countries_data[0].keys()),
         )
         return dataset
 
@@ -160,14 +154,12 @@ class Pipeline:
             "description": self._configuration["description_entities"],
         }
 
-        dataset.generate_resource_from_iterable(
-            headers=list(entities_data[0].keys()),
-            iterable=entities_data,
-            hxltags={},
+        dataset.generate_resource(
             folder=self._tempdir,
             filename=f"{self._configuration['resource_entities']}.csv",
+            rows=entities_data,
             resourcedata=resource_data,
-            quickcharts=None,
+            headers=list(entities_data[0].keys()),
         )
         return dataset
 
@@ -196,14 +188,12 @@ class Pipeline:
             "description": self._configuration["description_readiness"],
         }
 
-        dataset.generate_resource_from_iterable(
-            headers=list(readiness_data[0].keys()),
-            iterable=readiness_data,
-            hxltags={},
+        dataset.generate_resource(
             folder=self._tempdir,
             filename=f"{self._configuration['resource_readiness']}.csv",
+            rows=readiness_data,
             resourcedata=resource_data,
-            quickcharts=None,
+            headers=list(readiness_data[0].keys()),
         )
         return dataset
 
